@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
-# 2017/10/12 22:12
-# version 2.0
+# 2017/10/13 18:12
+# version 3.0
 '''
     generate a series of code
 '''
@@ -8,17 +8,40 @@
 import random
 import string
 
+chars = string.ascii_letters + string.digits
 
-def generate_code(length):
+def get_code():
     '''
-       >>>gen_code()
+       获得四个字母和数字的随机组合
+       >>>get_code()
+       ak7h
        
-       k7lKLQWLwo8KrGu6
-       
+       >>>get_code()
+       CgJ0
     '''
-    chars = string.ascii_letters + string.digits
+    return "".join([random.choice(chars) for i in range(4)])
+
+def concatenate(length):
+    '''
+       生成的每个激活码中有几组
+       >>>concatenate(4)
+       5jSI-1205-IjN2-Thn3
+       
+       >>>concatenate(2)
+       erz7-k9Ux
+    '''
+    return "-".join([get_code() for i in range(length//4)])
+
+
+def generate_code(quantity=1,length=16):
+    '''
+        生成quantity组,长度为length位的激活码
+    '''
+    for i in range(quantity):
+        content = concatenate(length)
+        print(content)
+        save_code(content)
     
-    return ''.join([random.choice(chars) for i in range(length)])
 
 
 def save_code(content):
@@ -26,8 +49,5 @@ def save_code(content):
         file.write(content + '\n')
 
 if __name__ == '__main__':
-    for i in range(5):
-        content = generate_code(16)
-        print (content)
-        save_code(content)
+    generate_code(3,16)
 
