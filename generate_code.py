@@ -23,11 +23,11 @@ def get_code():
 
 def concatenate(length):
     '''
-       生成的每个激活码中有几组
-       >>>concatenate(4)
+       生成的每个激活码中有多少位
+       >>>concatenate(16)
        5jSI-1205-IjN2-Thn3
        
-       >>>concatenate(2)
+       >>>concatenate(8)
        erz7-k9Ux
     '''
     return "-".join([get_code() for i in range(length//4)])
