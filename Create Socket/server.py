@@ -1,3 +1,4 @@
+#version1.2
 #-*- coding:utf-8 -*-  
   
 from socket import *  
@@ -28,7 +29,9 @@ while True:
                 if data=='':  
                     inputlist.remove(tcpCliSock)  
                     break
+                print('\033[1;33;40m')
                 print (data)
+                print('\033[0m')
             else:               
                 data = input('> ')  
                 if data=='':    

@@ -1,3 +1,4 @@
+#version1.2
 #-*- coding:utf-8 -*-
  
 from socket import *  
@@ -21,7 +22,9 @@ while True:
             data = tcpCliSock.recv(BUFSIZ).decode() 
             if data=='':  
                 break
+            print('\033[1;32;40m')
             print (data)
+            print('\033[0m')
         else:  
             data = input('> ')  
             if data=='':      
