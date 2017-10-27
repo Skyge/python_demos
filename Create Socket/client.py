@@ -1,25 +1,32 @@
 #-*- coding:utf-8 -*-
-#version1.0
+ 
+from socket import *  
 
-from socket import *
-
-HOST = 'localhost'
-PORT = 21567
-BUFSIZ = 1024
+import select  
+import sys  
+  
+HOST = 'localhost'  
+PORT = 21567  
+BUFSIZ = 1024  
 ADDR = (HOST, PORT)
 
-tcpCliSock = socket(AF_INET,SOCK_STREAM)
-tcpCliSock.connect(ADDR)
-
-while True:
-    data_to = input('To Server: ')
-    if not data_to:
-        break
-    tcpCliSock.send(data_to.encode())
-    
-    data_from = tcpCliSock.recv(BUFSIZ).decode()
-    if not data_from:
-        break
-    print('From Server: ',data_from)
-
-tcpCliSock.close()
+tcpCliSock = socket(AF_INET, SOCK_STREAM)  
+tcpCliSock.connect(ADDR)  
+inputlist = [tcpCliSock, sys.stdin]  
+  
+while True:  
+    readyInput,readyOutput,readyException = select.select(inputlist,[],[])  
+    for indata in readyInput:  
+        if indata==tcpCliSock:  
+            data = tcpCliSock.recv(BUFSIZ).decode() 
+            if data=='':  
+                break
+            print (data)
+        else:  
+            data = input('> ')  
+            if data=='':      
+                break  
+            tcpCliSock.send(data.encode())  
+    if data=='':    
+        break  
+tcpCliSock.close()  
