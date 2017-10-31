@@ -1,44 +1,37 @@
-#version1.2
-#-*- coding:utf-8 -*-  
-  
-from socket import *  
+#-*- coding:utf-8 -*-
+#version1.3
 
-import select  
-import sys  
-  
-HOST = ''  
-PORT = 21567  
-BUFSIZ = 1024  
-ADDR = (HOST, PORT)  
-  
-tcpSerSock = socket(AF_INET, SOCK_STREAM)  
-tcpSerSock.bind(ADDR)  
-tcpSerSock.listen(5)  
-inputlist = [tcpSerSock, sys.stdin]      
-  
-while True:  
-    print ('waiting for connection...')  
-    tcpCliSock, addr = tcpSerSock.accept()  
-    print ('...connected from:',addr)  
-    inputlist.append(tcpCliSock)      
+from socket import *
+
+import threading
+
+HOST = ""
+PORT = 21567
+BUFSIZE = 1024
+ADDR = (HOST, PORT)
+
+tcpSerSock = socket(AF_INET, SOCK_STREAM)
+tcpSerSock.bind(ADDR)
+tcpSerSock.listen(4)
+
+
+print("waiting for connection...")
+tcpCliSock, addr = tcpSerSock.accept()
+print("...connected from:", addr)
+
+    
+def rec(tcpCliSock):    
     while True:  
-        readyInput, readyOutput, readyException = select.select(inputlist,[],[])    
-        for indata in readyInput:  
-            if indata==tcpCliSock:     
-                data = tcpCliSock.recv(BUFSIZ).decode()   
-                if data=='':  
-                    inputlist.remove(tcpCliSock)  
-                    break
-                print('\033[1;33;40m')
-                print (data)
-                print('\033[0m')
-            else:               
-                data = input('> ')  
-                if data=='':    
-                    inputlist.remove(tcpCliSock)  
-                    break  
-                tcpCliSock.send(data.encode())  
-        if data=='':  
+        data = tcpCliSock.recv(1024).decode()
+        if data == "exit":  
             break  
-    tcpCliSock.close()  
-tcpSerSock.close()  
+        print('From Client:', data)  
+chat = threading.Thread(target=rec, args=(tcpCliSock, ))  
+chat.start()  
+while True:  
+    data = input(">") 
+    if data == "exit":  
+        break
+    tcpCliSock.send(data.encode())
+
+tcpCliSock.close()  

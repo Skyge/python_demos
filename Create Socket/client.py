@@ -1,35 +1,31 @@
-#version1.2
 #-*- coding:utf-8 -*-
- 
-from socket import *  
+#version1.3
 
-import select  
-import sys  
-  
-HOST = 'localhost'  
-PORT = 21567  
-BUFSIZ = 1024  
-ADDR = (HOST, PORT)
+from socket import *
 
-tcpCliSock = socket(AF_INET, SOCK_STREAM)  
-tcpCliSock.connect(ADDR)  
-inputlist = [tcpCliSock, sys.stdin]  
+import threading
+
+HOST = "localhost"
+PORT = 21567
+BUFSIZ = 1024
+ADDR = (HOST,PORT)
+
+tcpCliSock = socket(AF_INET, SOCK_STREAM)
+tcpCliSock.connect(ADDR)
+
   
+def rec(tcpCliSock): 
+    while True:  
+        data = tcpCliSock.recv(1024).decode()
+        if data == "exit":  
+            break  
+        print('From Server:', data)  
+chat = threading.Thread(target=rec, args=(tcpCliSock, ))  
+chat.start()  
 while True:  
-    readyInput,readyOutput,readyException = select.select(inputlist,[],[])  
-    for indata in readyInput:  
-        if indata==tcpCliSock:  
-            data = tcpCliSock.recv(BUFSIZ).decode() 
-            if data=='':  
-                break
-            print('\033[1;32;40m')
-            print (data)
-            print('\033[0m')
-        else:  
-            data = input('> ')  
-            if data=='':      
-                break  
-            tcpCliSock.send(data.encode())  
-    if data=='':    
-        break  
-tcpCliSock.close()  
+    data = input(">") 
+    if data == "exit":  
+        break
+    tcpCliSock.send(data.encode())
+
+tcpCliSock.close()
