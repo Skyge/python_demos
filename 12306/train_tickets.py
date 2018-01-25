@@ -1,10 +1,11 @@
 # -*- coding:utf-8-*-
-# version 1.0
+# version 1.1
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from sendEmail import send_email
 
 import os
 import time
@@ -67,13 +68,13 @@ def query(browser):
     browser.find_element_by_id("query_ticket").click()   
 
 
-def book(browser):
+def query_ticket(browser):
     print("you are booking")
     query_times = 0
-    time_begin = time.time()
 
     while True:
         time.sleep(0.1)
+        time_begin = time.time()
         try:
             ticket = WebDriverWait(browser, 30).until(
                 EC.presence_of_element_located((By.XPATH, '//*[@id="RW_2400000Z630C"]'))
@@ -88,12 +89,14 @@ def book(browser):
         if ticket_status == "无" or ticket_status == "*":
             query_times += 1
             time_end = time.time()
-            print("第{}次查询，总耗时为{}秒".format(query_times, time_end-time_begin))
+            print("第{}次查询，此次耗时为{:.3}秒".format(query_times, time_end-time_begin))
             continue
         else:
             browser.find_element_by_xpath('//*[@id="ticket_2400000Z630C"]/td[13]/a').click()
             break
 
+        
+def select_passenger(browser):
     passenger_url = "https://kyfw.12306.cn/otn/confirmPassenger/initDc"
     while True:
         if browser.current_url == passenger_url:
@@ -111,12 +114,13 @@ def book(browser):
 
     browser.find_element_by_xpath('//*[@id="submitOrder_id"]').click()
 
+    
+def submit_ticket(browser):
     while True:
         try:
-            
             browser.find_element_by_id("qr_submit_id").click()
-            
-            print ("Success!")
+            print("预定成功，请及时支付！")
+            send_email()
             break
         except:
             print ("请手动通过图片验证码")
@@ -129,7 +133,9 @@ def book(browser):
 if __name__ == "__main__":
     browser = login()
     query(browser)
-    book(browser)
+    query_ticket(browser)
+    select_passenger(browser)
+    submit_ticket(browser)
 
 
 
