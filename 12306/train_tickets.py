@@ -1,23 +1,53 @@
 # -*- coding:utf-8-*-
-# version 1.1
+# version 1.2
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from sendEmail import send_email
+from configparser import ConfigParser
 
 import os
 import time
-
-username = "your_usename"
-password = "your_password"
-
-from_station = "%u5317%u4EAC%2CBJP" # 出发地：北京
-to_station = "%u957F%u6625%2CCCT"   # 目的地：长春
-from_date= "2018-02-05"
+import sys
+import pickle
 
 
+cp = ConfigParser()
+try:
+    cp.read("config.ini", encoding="utf-8-sig")
+except IOError as e:
+    print("配置文件config.ini打开失败, 请重新创建")
+    input("Press any key to continue")
+    sys.exit()
+# 用户名
+username = cp["login"]["username"]
+# 密码
+password = cp["login"]["password"]
+# 始发站
+from_station = cp["train_info"]["from_station"]
+# 终点站
+to_station = cp["train_info"]["to_station"]
+# 乘车时间
+from_date= "2018-03-07"
+
+
+
+def convert_station(station):
+    # 只读二进制方式打开station.pkl文件，读取二进制形式到station_file文件中
+    station_file = open("station.pkl", "rb")
+    # 使用pickle加载二进制文件station_file，到字典station_lists中
+    station_lists = pickle.load(station_file)
+    # 关闭文件
+    station_file.close()
+    
+    station_unicode = station.encode("unicode_escape").decode("utf-8") \
+                             .replace("\\u", "%u")+"%2c"+station_lists[station]
+    
+    return station_unicode
+
+    
 def login():
     login_url = "https://kyfw.12306.cn/otn/login/init"
     login_done_url = "https://kyfw.12306.cn/otn/index/initMy12306"
@@ -49,13 +79,15 @@ def query(browser):
     
     query_url = "https://kyfw.12306.cn/otn/leftTicket/init"
     browser.get(query_url)
+    from_station_unicode = convert_station(from_station)
+    to_station_unicode = convert_station(to_station)
 
     browser.add_cookie({"name": "_jc_save_fromStation",
-                       "value": from_station
+                       "value": from_station_unicode
                        })
 
     browser.add_cookie({"name": "_jc_save_toStation",
-                       "value": to_station
+                       "value": to_station_unicode
                        })
 
     browser.add_cookie({"name": "_jc_save_fromDate",
