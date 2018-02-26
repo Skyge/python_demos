@@ -18,8 +18,7 @@ Question:
     Given an integer N,generate the Nth term of the count-and-say sequence.
 
 '''
-import re
-
+"""
 def countAndSay(num):
     s = "1"
     for _ in range(num-1):
@@ -27,7 +26,14 @@ def countAndSay(num):
                     for group, digit in re.findall("((.)\\2*)", s))
 
     return s
+"""
+import re
 
+def countAndSay(num):
+    s = "1"
+    for _ in range(num-1):
+        s = re.sub("(.)\\1*", lambda m:str(len(m.group(0))) + m.group(1), s)
+    return s
 
 if __name__ == "__main__":
     num = 5
