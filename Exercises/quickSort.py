@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 # 2018/03/03
-
+'''
 def quickSort(lists, left, right):
     """
     快速排序:
@@ -35,8 +35,13 @@ def quickSort(lists, left, right):
     quickSort(lists, left, low - 1)
     quickSort(lists, high + 1, right)
     return lists
+'''
+def quickSort(L):
+    if len(L) <= 1: return L
+    return quickSort([lt for lt in L[1:] if lt < L[0]]) + L[0:1]+ \
+    quickSort([ge for ge in L[1:] if ge >= L[0]])
 
 if __name__ == '__main__':
     lst = [1,4,46,28,2,16,71,23,35]
-    print(quickSort(lst, 0, len(lst)-1))
+    print(quickSort(lst))
 
